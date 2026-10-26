@@ -1,0 +1,6 @@
+# Dev artefacts: downloaded models, rendered videos, test outputs (regenerable)
+dev/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.blend1
