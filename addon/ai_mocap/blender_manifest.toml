@@ -1,0 +1,25 @@
+schema_version = "1.0.0"
+
+id = "ai_mocap"
+version = "0.3.0"
+name = "AI Mocap"
+tagline = "Animación editable a partir de un vídeo, con IA local"
+maintainer = "Santiagangas"
+type = "add-on"
+
+website = "https://github.com/Santiagangas/blender-ai-mocap"
+tags = ["Animation", "Rigging"]
+
+blender_version_min = "4.4.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+
+[permissions]
+files = "Leer vídeos y guardar el motor, los modelos y la caché"
+network = "Descargar una vez el motor de captura y los modelos de pose"
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "*.pyc",
+]

@@ -1,0 +1,5 @@
+# Capture engine dependencies (installed in the engine's own venv, never in Blender).
+# MediaPipe brings opencv-contrib-python, which the engine uses to read videos.
+mediapipe==1.1.1
+opencv-contrib-python==5.0.0.93
+numpy==2.5.4

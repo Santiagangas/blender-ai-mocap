@@ -29,7 +29,10 @@ def _channelbag(action, slot):
         return strip.channelbag(slot, ensure=True)
 
 
-def _write_curve(cbag, group, data_path, index, frames, values):
+INTERPOLATION = {'CONSTANT': 0, 'LINEAR': 1, 'BEZIER': 2}
+
+
+def _write_curve(cbag, group, data_path, index, frames, values, interpolation='LINEAR'):
     fc = cbag.fcurves.new(data_path, index=index)
     fc.group = group
     kp = fc.keyframe_points
@@ -37,16 +40,20 @@ def _write_curve(cbag, group, data_path, index, frames, values):
     co = np.empty(2 * len(frames), dtype=np.float32)
     co[0::2], co[1::2] = frames, values
     kp.foreach_set("co", co)
-    # Every frame is keyed, so linear interpolation reproduces the solve exactly
+    # With every frame keyed, linear interpolation reproduces the solve exactly
     # and avoids Bezier overshoot; it can be changed freely in the Graph Editor.
-    kp.foreach_set("interpolation", np.ones(len(frames), dtype=np.int32))  # 1 = LINEAR
+    kp.foreach_set("interpolation",
+                   np.full(len(frames), INTERPOLATION[interpolation], dtype=np.int32))
     fc.update()
     return fc
 
 
-def write_action(arm_obj, result, frame_start, name, frame_step=1.0, assign=True):
+def write_action(arm_obj, result, frame_start, name, frame_step=1.0, assign=True,
+                 frames=None, interpolation='LINEAR'):
     """Create a new Action from a SolveResult and (optionally) assign it.
 
+    ``frames`` (optional) gives the scene frame of every sample; otherwise
+    samples are placed every ``frame_step`` frames from ``frame_start``.
     Returns the Action. The previous action stays in bpy.data (and in the NLA
     if the user pushed it there); nothing is deleted.
     """
@@ -57,8 +64,9 @@ def write_action(arm_obj, result, frame_start, name, frame_step=1.0, assign=True
         action.layers.new("Layer").strips.new(type='KEYFRAME')
     cbag = _channelbag(action, slot)
 
-    any_q = next(iter(result.quaternions.values()))
-    frames = frame_start + np.arange(len(any_q), dtype=np.float64) * frame_step
+    if frames is None:
+        any_q = next(iter(result.quaternions.values()))
+        frames = frame_start + np.arange(len(any_q), dtype=np.float64) * frame_step
     for bone_name, quats in result.quaternions.items():
         pb = arm_obj.pose.bones.get(bone_name)
         if pb is None:
@@ -68,12 +76,13 @@ def write_action(arm_obj, result, frame_start, name, frame_step=1.0, assign=True
         group = cbag.groups.get(bone_name) or cbag.groups.new(bone_name)
         path = f'pose.bones["{bpy.utils.escape_identifier(bone_name)}"].rotation_quaternion'
         for c in range(4):
-            _write_curve(cbag, group, path, c, frames, quats[:, c])
+            _write_curve(cbag, group, path, c, frames, quats[:, c], interpolation)
     if result.root_location is not None:
         group = cbag.groups.get(result.root_bone) or cbag.groups.new(result.root_bone)
         path = f'pose.bones["{bpy.utils.escape_identifier(result.root_bone)}"].location'
         for c in range(3):
-            _write_curve(cbag, group, path, c, frames, result.root_location[:, c])
+            _write_curve(cbag, group, path, c, frames, result.root_location[:, c],
+                         interpolation)
 
     if assign:
         ad = arm_obj.animation_data or arm_obj.animation_data_create()
