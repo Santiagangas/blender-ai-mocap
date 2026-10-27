@@ -78,6 +78,7 @@ def engine_job(scene, preview=False):
         "rotation": int(s.rotation),
         "mirror": bool(s.mirror),
         "min_confidence": round(float(s.min_confidence), 4),
+        "max_gap_s": round(float(s.max_gap), 4),
         "smoothing": round(float(s.smoothing), 4),
         "hfov_deg": round(float(s.hfov), 3),
         "assume_upright": bool(s.assume_upright),

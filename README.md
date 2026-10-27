@@ -14,7 +14,7 @@ Estado: **Fase 3 completada**: extensión instalable con interfaz completa.
 
 ## En dos minutos
 
-1. `python tools/build_zip.py` → `dist/ai_mocap-0.3.0.zip`.
+1. `python tools/build_zip.py` → `dist/ai_mocap-0.3.1.zip`.
 2. Blender → *Editar → Preferencias → Complementos → ⌄ → Instalar desde disco* → el ZIP.
 3. *Sistema → Red → Permitir acceso en línea*; en las preferencias del addon, **Instalar motor**.
 4. Visor 3D → **N** → pestaña **AI Mocap**: personaje, vídeo y **Generar animación**.

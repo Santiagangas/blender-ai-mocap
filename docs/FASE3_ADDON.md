@@ -120,3 +120,30 @@ Sigue pendiente una validación con un vídeo grabado a propósito: cuerpo enter
 3. **Fase 4:** fijar los pies al suelo, estabilizar la altura y la profundidad de la raíz, límites anatómicos, giro de
    los brazos por encima de la cabeza y suavizado mejorado.
 4. **Fase 5:** empaquetado final, documentación con capturas y pruebas en 4.4–5.0.
+
+## 6. Revisión 0.3.1 (tras las primeras pruebas en Windows)
+
+**Bailes de perfil: brazos y piernas «rotos».** Con un vídeo de baile visto de lado («Dame tu cosita»), el
+personaje salía con un brazo hacia atrás y las piernas cruzadas, aunque el informe decía «persona detectada en el
+100 %». La causa estaba en el motor. El brazo y la pierna del lado tapado tenían una confianza muy baja (mediana 0,01
+en el codo derecho), así que el motor los descartaba y rellenaba el hueco interpolando. El hueco más largo era de 49
+fotogramas (1,6 s), y durante todo ese tiempo se congelaba la pose de otro momento del baile.
+
+Corrección (motor 0.3.0): los huecos de baja confianza de hasta 0,25 s se siguen interpolando, porque suelen ser
+destellos. En los más largos se usa la estimación que da MediaPipe para la parte tapada, que es mucho más verosímil.
+Se puede ajustar en *Procesamiento → Avanzado → Interpolar huecos de hasta*.
+
+| Mismo vídeo, modelo Heavy | Antes | Después |
+|---|---|---|
+| Codo / muñeca derechos inventados por interpolación | 68 % / 71 % | 1 % / 4 % |
+| Rodilla / tobillo derechos inventados | 60 % / 45 % | 1 % / 4 % |
+| Máximo inventado en cualquier punto (solo dedos y talones) | 74 % | 13 % |
+
+Al comparar con el vídeo, las piernas pasan de salir juntas y cruzadas a flexionarse y abrirse como en el vídeo, y
+los brazos estirados coinciden. Como cambia la versión del motor, la caché anterior no se reutiliza y el vídeo se
+vuelve a analizar.
+
+**Blender 4.4 y 4.5.** Esas versiones traen Python 3.11, y NumPy 2.5.4 solo existe para Python 3.12 o superior, así
+que la instalación del motor fallaba. Ahora `engine_requirements.txt` fija NumPy 2.4.6 en Python 3.11 y 2.5.4 en las
+versiones más nuevas. Las instalaciones existentes aparecen como «Necesita actualizarse»: basta con pulsar
+**Actualizar motor**.

@@ -3,7 +3,7 @@ import numpy as np
 from ai_mocap_engine.skeleton import (CAMERA_TO_CONTRACT, J, JOINT_NAMES, LR_AXIS_PAIRS,
                                       SWAP_LR, camera_to_contract)
 from ai_mocap_engine.temporal import (fill_gaps, flip_front_back, one_euro, resolve_facing,
-                                      smoothing_to_cutoff, zero_phase_one_euro)
+                                      smoothing_to_cutoff, trust_long_gaps, zero_phase_one_euro)
 
 
 def test_camera_to_contract_is_a_proper_rotation():
@@ -61,3 +61,18 @@ def test_resolve_facing_repairs_front_back_flips():
     world[bad] = fw
     flip = resolve_facing(world, list(SWAP_LR), LR_AXIS_PAIRS, "camera", 30)
     assert np.array_equal(flip, bad)
+
+
+def test_trust_long_gaps_keeps_detector_estimate_for_hidden_limbs():
+    # joint 0: one-frame glitch (interpolate); joint 1: hidden for 6 frames (trust detector)
+    valid = np.ones((10, 2), dtype=bool)
+    valid[4, 0] = False
+    valid[2:8, 1] = False
+    detected = np.ones(10, dtype=bool)
+    detected[6] = False                       # no person at all in frame 6
+    out, trusted = trust_long_gaps(valid, detected, max_gap=3)
+    assert not out[4, 0] and not trusted[:, 0].any()
+    assert out[2:6, 1].all() and out[7, 1] and not out[6, 1]
+    assert trusted[:, 1].sum() == 5
+    out0, _ = trust_long_gaps(valid, detected, max_gap=100)   # nothing trusted
+    assert np.array_equal(out0, valid)

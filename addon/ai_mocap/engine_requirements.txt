@@ -2,4 +2,6 @@
 # MediaPipe brings opencv-contrib-python, which the engine uses to read videos.
 mediapipe==1.1.1
 opencv-contrib-python==5.0.0.93
-numpy==2.5.4
+# NumPy 2.5 needs Python 3.12+; Blender 4.4/4.5 ship Python 3.11.
+numpy==2.5.4; python_version >= "3.12"
+numpy==2.4.6; python_version < "3.12"

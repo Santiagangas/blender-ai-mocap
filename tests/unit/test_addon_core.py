@@ -74,4 +74,5 @@ def test_models_table_is_consistent():
         assert len(info["sha256"]) == 64 and info["size"] > 1_000_000
     with open(E.REQUIREMENTS_FILE) as fh:
         reqs = [l.split("==")[0] for l in fh if l.strip() and not l.startswith("#")]
+        assert sum(r == "numpy" for r in reqs) == 2   # one pin per Python range
     assert {"mediapipe", "numpy", "opencv-contrib-python"} <= set(reqs)

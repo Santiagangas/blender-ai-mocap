@@ -6,5 +6,5 @@ coherent motion and writes it using the versioned data contract
 (``result.json`` + ``motion.npz``) consumed by the Blender add-on.
 """
 
-ENGINE_VERSION = "0.2.0"
+ENGINE_VERSION = "0.3.0"
 CONTRACT_VERSION = 1

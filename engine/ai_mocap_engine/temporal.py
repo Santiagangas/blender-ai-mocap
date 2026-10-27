@@ -33,6 +33,41 @@ def fill_gaps(values, valid):
     return values, interpolated, never_seen
 
 
+def trust_long_gaps(valid, detected, max_gap):
+    """Accept the detector's own estimate during long low-confidence stretches.
+
+    A joint hidden behind the body (side views, crossed legs) gets low
+    confidence for many frames, yet the detector still places it plausibly.
+    Interpolating such a stretch would freeze the limb in a pose from another
+    moment, so only short gaps (glitches) stay invalid and get interpolated.
+
+    valid: (F, J) bool, confidence above threshold.
+    detected: (F,) bool, a person was found in the frame.
+    max_gap: longest run (frames) that is still interpolated.
+    Returns (new_valid, trusted_mask).
+    """
+    valid = np.array(valid, dtype=bool, copy=True)
+    trusted = np.zeros_like(valid)
+    F, Jn = valid.shape
+    for j in range(Jn):
+        f = 0
+        while f < F:
+            if valid[f, j]:
+                f += 1
+                continue
+            end = f
+            while end < F and not valid[end, j]:
+                end += 1
+            if end - f > max_gap:
+                run = np.zeros(F, dtype=bool)
+                run[f:end] = True
+                run &= detected
+                trusted[run, j] = True
+                valid[run, j] = True
+            f = end
+    return valid, trusted
+
+
 def flip_front_back(world_cam, image, conf, swap_index):
     """The monocular front/back alternative of a pose: left/right labels swapped
     and depth mirrored around the pelvis (2D projections stay identical)."""

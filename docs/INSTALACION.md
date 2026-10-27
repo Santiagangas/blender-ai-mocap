@@ -5,7 +5,7 @@ internet solo durante la instalación. No hace falta GPU ni cuenta en ningún se
 
 ## 1. Instalar el addon
 
-1. Consigue el archivo `ai_mocap-0.3.0.zip` (o genéralo desde el repositorio con `python tools/build_zip.py`;
+1. Consigue el archivo `ai_mocap-0.3.1.zip` (o genéralo desde el repositorio con `python tools/build_zip.py`;
    aparece en `dist/`).
 2. En Blender: **Editar → Preferencias → Complementos**. Pulsa la flecha ⌄ de la esquina superior derecha y elige
    **Instalar desde disco…**. Selecciona el `.zip`.

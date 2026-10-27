@@ -12,7 +12,7 @@ from .errors import EngineError
 from .root import estimate_root
 from .skeleton import JOINT_NAMES, LR_AXIS_PAIRS, NUM_JOINTS, SWAP_LR, camera_to_contract
 from .temporal import (fill_gaps, flip_front_back, resolve_facing, smoothing_to_cutoff,
-                       zero_phase_one_euro)
+                       trust_long_gaps, zero_phase_one_euro)
 from . import video_io
 
 DEFAULT_JOB = {
@@ -26,6 +26,7 @@ DEFAULT_JOB = {
     "rotation": 0,               # extra clockwise rotation (0/90/180/270)
     "mirror": False,             # selfie footage: flip frames horizontally
     "min_confidence": 0.5,       # joints below this are treated as missing
+    "max_gap_s": 0.25,           # longer low-confidence stretches keep the detector's estimate
     "smoothing": 0.5,            # 0..1
     "hfov_deg": 60.0,            # assumed camera horizontal field of view
     "assume_upright": True,      # reject upside-down detections (disable for handstands)
@@ -123,6 +124,8 @@ def run_job(job, progress=None):
 
     progress.emit({"type": "progress", "stage": "temporal", "done": 0, "total": 1}, force=True)
     valid = detected[:, None] & (conf >= job["min_confidence"])
+    max_gap = max(0, int(round(float(job["max_gap_s"]) * target_fps)))
+    valid, trusted = trust_long_gaps(valid, detected, max_gap)
     world_cam, interpolated, never_seen = fill_gaps(world_cam, valid)
     image, _, _ = fill_gaps(image, valid)
 
@@ -175,11 +178,12 @@ def run_job(job, progress=None):
         "processed_size": [width, height],
         "backend": backend_meta,
         "settings": {k: job[k] for k in ("start_s", "end_s", "target_fps", "rotation", "mirror",
-                                          "min_confidence", "smoothing", "hfov_deg",
+                                          "min_confidence", "max_gap_s", "smoothing", "hfov_deg",
                                           "assume_upright", "initial_facing")},
         "quality": {
             "detected_ratio": float(detected.mean()),
             "interpolated_ratio_per_joint": dict(zip(JOINT_NAMES, interpolated.mean(axis=0).round(4).tolist())),
+            "estimated_ratio_per_joint": dict(zip(JOINT_NAMES, trusted.mean(axis=0).round(4).tolist())),
             "never_seen_joints": [JOINT_NAMES[i] for i in np.flatnonzero(never_seen)],
             "inverted_detections": stats["inverted"],
             "inverted_recovered": stats["recovered"],

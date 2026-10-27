@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "ai_mocap"
-version = "0.3.0"
+version = "0.3.1"
 name = "AI Mocap"
 tagline = "Animación editable a partir de un vídeo, con IA local"
 maintainer = "Santiagangas"

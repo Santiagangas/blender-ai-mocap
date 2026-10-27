@@ -157,6 +157,7 @@ class AIMOCAP_PT_processing(_Base, Panel):
             col.use_property_split = True
             col.use_property_decorate = False
             col.prop(s, "min_confidence", slider=True)
+            col.prop(s, "max_gap")
             col.prop(s, "hfov")
             col.prop(s, "initial_facing")
             col.prop(s, "assume_upright")

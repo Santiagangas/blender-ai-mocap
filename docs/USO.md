@@ -35,7 +35,9 @@ Para probar ajustes rápido, usa **Vista previa (3 s)**, que procesa solo los pr
 - **Modelo:** *Lite* (rápido), *Full* (recomendado) o *Heavy* (más lento; mejor con personas lejanas o con poca luz).
 - **FPS:** *De la escena* (recomendado: un keyframe por fotograma), *Del vídeo* o *Personalizado*.
 - **Suavizado:** más alto quita temblor; demasiado alto suaviza los golpes o movimientos rápidos.
-- **Avanzado:** confianza mínima, campo de visión de la cámara, orientación inicial, «Persona de pie» (desactívalo
+- **Avanzado:** confianza mínima, **Interpolar huecos de hasta** (los huecos breves se interpolan; si una parte del
+  cuerpo queda tapada más tiempo, se usa la estimación de la IA en vez de congelar la pose de otro momento), campo de
+  visión de la cámara, orientación inicial, «Persona de pie» (desactívalo
   para volteretas o el pino) y **Reutilizar análisis**.
 - **Regenerar sin IA:** crea otra Action desde el último análisis con los ajustes actuales de retargeting y salida.
   Tarda menos de un segundo.
@@ -87,3 +89,6 @@ animación.
 - **Manos:** orientación aproximada y **sin dedos**.
 - **Brazos por encima de la cabeza:** el giro del brazo puede fallar en algunos fotogramas.
 - Se sigue a **una sola persona**.
+- **Personajes no humanos** (dibujos, criaturas con proporciones extrañas): la IA está entrenada con personas reales.
+  Suele funcionar, pero con más errores, sobre todo de perfil. Un vídeo de una persona real haciendo el mismo
+  movimiento da mejor resultado.

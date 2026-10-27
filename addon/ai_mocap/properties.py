@@ -112,6 +112,11 @@ class AIMOCAP_PG_scene(PropertyGroup):
                                   subtype='FACTOR',
                                   description="Por debajo de este valor una articulación se considera "
                                               "oculta y se interpola")
+    max_gap: FloatProperty(name="Interpolar huecos de hasta", default=0.25, min=0.0, max=5.0,
+                           unit='TIME_ABSOLUTE',
+                           description="Huecos breves de baja confianza se interpolan. En los más largos "
+                                       "(una parte del cuerpo tapada, bailes de perfil) se usa la "
+                                       "estimación de la IA en vez de congelar la pose de otro momento")
     hfov: FloatProperty(name="Campo de visión", default=60.0, min=10.0, max=150.0,
                         description="Campo de visión horizontal aproximado de la cámara, en grados "
                                     "(60 = móvil o webcam típicos)")
